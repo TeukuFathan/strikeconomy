@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import EconomyPanel from './component/EconomyPanel';
+import GameMap from './component/GameMap';
+import UI from './component/Ui';
 
 function App() {
   const [economy, setEconomy] = useState({
@@ -7,14 +8,26 @@ function App() {
     debt: 500,
     income: 300,
     expenses: 150,
-    investorCut: 0.1, // 10%
+    investorCut: 0.1,
   });
 
+  const [soldiers, setSoldiers] = useState([]);
+  const barrackPos = { x: 0, y: 0 }; // top-left corner of the map
+
+  const handleSpawnSoldier = () => {
+    const newX = 6;
+    const newY = soldiers.length * 2; // staggers down
+    setSoldiers([...soldiers, { x: newX, y: newY }]);
+    setEconomy((prev) => ({
+      ...prev,
+      cash: prev.cash - 150,
+    }));
+  };
+
   return (
-    <div className="flex justify-end px-4 sm:px-8 md:px-12 lg:px-20 py-4">
-      <div className="max-w-sm w-full">
-        <EconomyPanel economy={economy} />
-      </div>
+    <div className="relative w-full h-screen flex flex-col items-center justify-center gap-4">
+      <GameMap barrackPos={barrackPos} soldiers={soldiers} />
+      <UI economy={economy} setEconomy={setEconomy} onSpawnSoldier={handleSpawnSoldier} />
     </div>
   );
 }

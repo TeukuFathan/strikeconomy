@@ -1,10 +1,4 @@
-import type { EconomyState } from '../types';
-
-interface Props {
-  economy: EconomyState;
-}
-
-export default function EconomyPanel({ economy }: Props) {
+export default function EconomyPanel({ economy }) {
   const net = economy.income - economy.expenses;
 
   return (
