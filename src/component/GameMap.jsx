@@ -1,38 +1,42 @@
+import React, { useEffect, useRef } from 'react';
 
-const GRID_SIZE = 10;
+const GameMap = ({ gameObjects }) => {
+  const canvasRef = useRef();
+  const imageCache = useRef({});
 
-export default function GameMap({ barrackPos, soldiers }) {
-  return (
-    <div className="grid grid-cols-10 gap-0.5 w-fit bg-gray-900 p-2 border border-gray-600">
-      {[...Array(GRID_SIZE * GRID_SIZE)].map((_, i) => {
-        const x = i % GRID_SIZE;
-        const y = Math.floor(i / GRID_SIZE);
+  const loadImage = (key, src) =>
+    new Promise((resolve) => {
+      if (imageCache.current[key]) return resolve(imageCache.current[key]);
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        imageCache.current[key] = img;
+        resolve(img);
+      };
+    });
 
-        const isBarrack =
-          x >= barrackPos.x &&
-          x < barrackPos.x + 5 &&
-          y >= barrackPos.y &&
-          y < barrackPos.y + 5;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const { width, height } = canvas.getBoundingClientRect();
 
-        const isSoldier = soldiers.some(
-          (s) =>
-            x >= s.x &&
-            x < s.x + 2 &&
-            y >= s.y &&
-            y < s.y + 2
-        );
+    canvas.width = width;
+    canvas.height = height;
+    ctx.imageSmoothingEnabled = false;
 
-        let cellClass = 'bg-green-700';
-        if (isBarrack) cellClass = 'bg-yellow-600';
-        if (isSoldier) cellClass = 'bg-blue-500';
+    const draw = async () => {
+      ctx.clearRect(0, 0, width, height);
 
-        return (
-          <div
-            key={i}
-            className={`w-8 h-8 ${cellClass} border border-gray-800`}
-          ></div>
-        );
-      })}
-    </div>
-  );
-}
+      for (const obj of gameObjects) {
+        const img = await loadImage(obj.type, obj.image);
+        ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
+      }
+    };
+
+    draw();
+  }, [gameObjects]);
+
+  return <canvas ref={canvasRef} className="w-full h-full border" />;
+};
+
+export default GameMap;

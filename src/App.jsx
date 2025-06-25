@@ -1,9 +1,10 @@
+import EconomyPanel from './component/EconomyPanel.jsx';
 import { useState } from 'react';
-import GameMap from './component/GameMap';
-import UI from './component/Ui';
-
-function App() {
-  const [economy, setEconomy] = useState({
+import GameMap from './component/GameMap.jsx';
+import Barracks from './logic/objects/buildings/Barracks.js';
+import Infantry from './logic/objects/units/Infantry.js';
+export default function App() {
+  const [economy] = useState({
     cash: 1000,
     debt: 500,
     income: 300,
@@ -11,25 +12,47 @@ function App() {
     investorCut: 0.1,
   });
 
-  const [soldiers, setSoldiers] = useState([]);
-  const barrackPos = { x: 0, y: 0 }; // top-left corner of the map
 
-  const handleSpawnSoldier = () => {
-    const newX = 6;
-    const newY = soldiers.length * 2; // staggers down
-    setSoldiers([...soldiers, { x: newX, y: newY }]);
-    setEconomy((prev) => ({
-      ...prev,
-      cash: prev.cash - 150,
-    }));
-  };
+  const gameObjects = [
+    new Barracks(0, 0),
+    new Infantry(100,100)
+  ];
+
+
+  const net = economy.income - economy.expenses;
 
   return (
-    <div className="relative w-full h-screen flex flex-col items-center justify-center gap-4">
-      <GameMap barrackPos={barrackPos} soldiers={soldiers} />
-      <UI economy={economy} setEconomy={setEconomy} onSpawnSoldier={handleSpawnSoldier} />
+    <div className="h-screen w-screen flex flex-row bg-gray-100">
+
+      {/* Left Column */}
+      <div className="w-1/5 bg-red-100 border border-red-300 flex items-center justify-center">
+        left Panel
+      </div>
+
+      {/* Center Column: contains Top / Map / Bottom */}
+      <div className="flex-1 flex flex-col border border-gray-400">
+
+        {/* Top Panel */}
+        <div className="h-1/5 bg-green-100 border-b border-green-300 flex items-center justify-center">
+          Top Panel
+        </div>
+
+        {/* Map Panel */}
+        <div className="flex-1 bg-white flex items-center justify-center border border-black  p-1">
+          <div className="w-full h-full">
+            <GameMap gameObjects={gameObjects} />
+          </div>
+        </div>
+        {/* Bottom Panel */}
+        <div className="h-1/5 bg-green-100 border-t border-green-300 flex items-center justify-center">
+          Bottom Panel
+        </div>
+      </div>
+
+      {/* Right Column */}
+      <div className="w-1/5 bg-red-100 border border-red-300 flex items-center justify-center">
+        <EconomyPanel economy={economy} />
+      </div>
     </div>
   );
 }
-
-export default App;
