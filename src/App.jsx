@@ -3,6 +3,8 @@ import { useState } from 'react';
 import GameMap from './component/GameMap.jsx';
 import Barracks from './logic/objects/buildings/Barracks.js';
 import Infantry from './logic/objects/units/Infantry.js';
+import SelectionPanel from './component/SelectionPanel.jsx';
+
 export default function App() {
   const [economy] = useState({
     cash: 1000,
@@ -11,12 +13,16 @@ export default function App() {
     expenses: 150,
     investorCut: 0.1,
   });
+  
+  const [selectedObject, setSelectedObject] = useState(null);
 
 
-  const gameObjects = [
+
+  const [gameObjects, setGameObjects] = useState([
     new Barracks(0, 0),
-    new Infantry(100,100)
-  ];
+    new Infantry(200, 100),
+  ]);
+
 
 
   const net = economy.income - economy.expenses;
@@ -25,9 +31,14 @@ export default function App() {
     <div className="h-screen w-screen flex flex-row bg-gray-100">
 
       {/* Left Column */}
-      <div className="w-1/5 bg-red-100 border border-red-300 flex items-center justify-center">
-        left Panel
+      <div className="w-1/5">
+        <SelectionPanel
+          selectedObject={selectedObject}
+          setGameObjects={setGameObjects}
+          gameObjects={gameObjects}
+        />
       </div>
+
 
       {/* Center Column: contains Top / Map / Bottom */}
       <div className="flex-1 flex flex-col border border-gray-400">
@@ -40,7 +51,7 @@ export default function App() {
         {/* Map Panel */}
         <div className="flex-1 bg-white flex items-center justify-center border border-black  p-1">
           <div className="w-full h-full">
-            <GameMap gameObjects={gameObjects} />
+            <GameMap gameObjects={gameObjects} onSelect={setSelectedObject} />
           </div>
         </div>
         {/* Bottom Panel */}
@@ -50,7 +61,7 @@ export default function App() {
       </div>
 
       {/* Right Column */}
-      <div className="w-1/5 bg-red-100 border border-red-300 flex items-center justify-center">
+      <div className="w-1/5 bg-red-100 border border-red-300">
         <EconomyPanel economy={economy} />
       </div>
     </div>
