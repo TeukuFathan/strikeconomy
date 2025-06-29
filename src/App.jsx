@@ -19,8 +19,7 @@ export default function App() {
 
 
   const [gameObjects, setGameObjects] = useState([
-    new Barracks(0, 0),
-    new Infantry(200, 100),
+    new Barracks(200, 200),
   ]);
 
 
@@ -34,8 +33,8 @@ export default function App() {
       <div className="w-1/5">
         <SelectionPanel
           selectedObject={selectedObject}
-          setGameObjects={setGameObjects}
           gameObjects={gameObjects}
+          setGameObjects={setGameObjects}
         />
       </div>
 
