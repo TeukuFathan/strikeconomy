@@ -1,9 +1,9 @@
 import EconomyPanel from './component/EconomyPanel.jsx';
-import { useState } from 'react';
+import { useState, useEffect  } from 'react';
 import GameMap from './component/GameMap.jsx';
 import Barracks from './logic/objects/buildings/Barracks.js';
-import Infantry from './logic/objects/units/Infantry.js';
 import SelectionPanel from './component/SelectionPanel.jsx';
+import Monster from './logic/objects/units/Monster';
 
 export default function App() {
   const [economy] = useState({
@@ -15,12 +15,53 @@ export default function App() {
   });
   
   const [selectedObject, setSelectedObject] = useState(null);
-
-
-
   const [gameObjects, setGameObjects] = useState([
     new Barracks(200, 200),
   ]);
+
+  const [mapSize, setMapSize] = useState({ width: 800, height: 600 }); // fallback
+
+  <GameMap
+      gameObjects={gameObjects}
+      onSelect={setSelectedObject}
+      reportSize={(width, height) => setMapSize({ width, height })}
+  />
+
+  useEffect(() => {
+      const spawnMonster = () => {
+          const monster = new Monster();
+          const spawned = monster.spawn(gameObjects, mapSize.width, mapSize.height);
+          if (spawned) {
+              setGameObjects(prev => [...prev, monster]);
+              console.log('Monster spawned:', monster);
+          }
+      };
+
+      const interval = setInterval(() => {
+          spawnMonster();
+      }, 5000);
+
+      return () => clearInterval(interval);
+  }, [mapSize]);
+
+
+  // Moving Monsters periodically
+  useEffect(() => {
+      const interval = setInterval(() => {
+          let moved = false;
+          gameObjects.forEach(obj => {
+              if (obj.type === 'monster') {
+                  obj.move(gameObjects);
+                  moved = true;
+              }
+          });
+          if (moved) {
+              setGameObjects([...gameObjects]);
+          }
+      }, 50);
+
+      return () => clearInterval(interval);
+  }, [gameObjects]);
 
 
 
